@@ -10,26 +10,26 @@ Stack::Stack()
 bool Stack::isEmpty()
 {
 	// If the top of the stack is less the 0, it must be empty
-	return (top == -1);
+	return (Top == -1);
 }
 
 bool Stack::isFull()
 {
 	// If the top is the max - 1, then is must be full
-	return (top == MAX_STACK - 1);
+	return (Top == MAX_STACK - 1);
 }
 
-int Stack::Top()
+int Stack::top()
 {
 	if (isEmpty() == true)
 	{
 		cout << "Error: Stack is empty" << endl;
-		exit(2);
+		exit(3);
 	}
 	else
 	{
 		// Sets the stacks current element to the top value
-		return stack[top];
+		return stack[Top];
 	}
 }
 
@@ -38,10 +38,11 @@ void Stack::pop()
 	if (isEmpty())
 	{
 		cout << "The stack is empty" << endl;
+		exit(2);
 	}
 	else
 	{
-		stack[top--];
+		stack[Top--];
 	}
 }
 
@@ -54,6 +55,6 @@ void Stack::push(int x)
 	}
 	else
 	{
-		stack[++top] = x;
+		stack[++Top] = x;
 	}
 }

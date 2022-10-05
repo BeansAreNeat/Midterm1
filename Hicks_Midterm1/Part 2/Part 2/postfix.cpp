@@ -1,58 +1,125 @@
 #include <iostream>
-#include <stdio.h>      /* printf, fgets */
-#include <stdlib.h>     /* atoi */
 #include "stack.h"
+#include <string>
 using namespace std;
-
-/* Questions:
-*		What does stack/input precedence mean??
-*		
+/*
+	Citations:
+	https://www.geeksforgeeks.org/stack-set-2-infix-to-postfix/
+	https://www.geeksforgeeks.org/stack-a-4-evaluation-postfix-expression/
+	https://www.geeksforgeeks.org/c-program-to-convert-string-to-integer/
+	https://gist.github.com/mycodeschool/7702441
 */
 
-bool isOperator(char input);
-void postfix();
+/* Questions:
+		What does stack/input precedence mean??
+		How to properly cite code
+		Clarify instructions
+*/
+
+// Postfix Expression Evaluation
+int postfix(char input);
+// Converts
+void convert(char input);
+// Finds operator precendce (Modified code from geeksforgeeks.org)
+int prec(char input);
 
 int main()
 {
-	char next;
-	int i = 0; // For void push();
-	Stack operandStack;
+	// Equation
+	string equ;
 
 	cout << "Enter mathematical expression: " << endl;
-	cin.get(next);
-
-	// Postfix Expression Evaluation
-	while (next != 'n/')
+	getline(cin, equ);
+		
+	for (int i = 0; i < equ.length(); i++)	// For as long as the string. from geeksforgeeks.org
 	{
-		if (isdigit(next))
-		{
-			operandStack.push(i);
-		}
-		else if (isOperator(next))
-		{
-			// Get the right operand stack???
-			operandStack.Top();
-			operandStack.pop();
-			// Then the left?
-
-		}
+		convert(equ[i]);
 	}
 
 	return 0;
 }
 
-void postfix() {
+void convert(char input)
+{
+	Stack stack;
+	string output;
 
+	if (isdigit(input))
+	{
+		output += input; // Add numbers to the output
+
+		// While stack prec >= input's
+		while (prec(stack.top()) >= prec(input))
+		{
+			output += stack.top(); // Readying the output
+			stack.pop();		   // Poping the stack
+		}
+		stack.push(input);			// Pushing input onto the stack
+	}
+
+	// While the top isn't a left parentheses
+	while (stack.top() != '(')
+	{
+		output += stack.top();	// Add the top of the stack to output
+		stack.pop();			// Pop the stack
+	}
+	cout << output << endl;
 }
 
-bool isOperator(char input)
+int postfix(char c)
 {
-	if (input == '+' || input == '*')
+	//operatorStack
+	Stack stack;
+
+	// Is char is is a digit, convert to int and store it.
+	if (isdigit(c))
 	{
-		return true;
+		int num = 0;
+		num = (num * 10) + (c - '0');	// Converts char to int, from geeksforgeeks
+		stack.push(num);				// Pushes number, not c since c is the wrong value
 	}
+	// If its an operator perform operation
 	else
 	{
-		return false;
+		// Get the right operand stack
+
+		int op1;
+		op1 = stack.top();
+		stack.pop();
+
+		// Get the left operand stack
+		int op2 = stack.top();
+		stack.pop();
+
+		int result = 0;
+		// Performing operation
+		if (c == '+')
+			result = op2 + op1;
+		else if (c == '-')
+			result = op2 - op1;
+		else if (c == '-')
+			result = op2 * op1;
+		else if (c == '/')
+			result = op2 / op1;
+
+		stack.push(result);
 	}
+	return stack.top();
+}
+
+int prec(char input)
+{
+	// If input is /,*, or %, then return highest precedence
+	if (input == '/' || input == '*' || input == '%')
+	{
+		return 2;
+	}
+	// If input is + or -, then return 1 for precendce
+	else if (input == '+' || input == '-')
+	{
+		return 1;
+	}
+	// Otherwise, return lowest precedence
+	else
+		return -1;
 }
