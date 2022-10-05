@@ -1,12 +1,11 @@
 #include <iostream>
-#include "stack.h"
+#include <stack>
 #include <string>
 using namespace std;
 /*
 	Citations:
 	https://www.geeksforgeeks.org/stack-set-2-infix-to-postfix/
 	https://www.geeksforgeeks.org/stack-a-4-evaluation-postfix-expression/
-	https://www.geeksforgeeks.org/c-program-to-convert-string-to-integer/
 	https://gist.github.com/mycodeschool/7702441
 */
 
@@ -16,56 +15,88 @@ using namespace std;
 		Clarify instructions
 */
 
-// Postfix Expression Evaluation
-int postfix(char input);
-// Converts
-void convert(char input);
-// Finds operator precendce (Modified code from geeksforgeeks.org)
-int prec(char input);
+int postfix(char input);	// Postfix Expression Evaluation
+void convert(char input);	// Converts Infix to postfix (First link in citation)
+int prec(char input);		// Finds operator precendce (Modified code from geeksforgeeks.org)
 
 int main()
 {
-	// Equation
-	string equ;
-
+	
+	string equ;	// Equation
 	cout << "Enter mathematical expression: " << endl;
 	getline(cin, equ);
 		
 	for (int i = 0; i < equ.length(); i++)	// For as long as the string. from geeksforgeeks.org
 	{
-		convert(equ[i]);
+		char c1;
+		c1 = equ[i];
+		convert(c1);
 	}
 
 	return 0;
 }
 
-void convert(char input)
+void convert(char c)
 {
-	Stack stack;
-	string output;
+	stack<int> stack;
+	string output;					// Postfix output
 
-	if (isdigit(input))
+	if (c >= '0' && c <= '9')		// If the operand is valid
 	{
-		output += input; // Add numbers to the output
+		output += c;				// Set it to output
+	}
 
-		// While stack prec >= input's
-		while (prec(stack.top()) >= prec(input))
+	// The two else if statements are for dealing with brackets
+	else if (c == '(')				// If char is left bracket
+	{
+		stack.push('(');			// Put left bracket in stack
+
+	}
+
+	else if (c == ')')				// If the char is right bracket
+	{
+		while (stack.top() != '(')	// and while the top of the stack is not the left bracket
 		{
-			output += stack.top(); // Readying the output
-			stack.pop();		   // Poping the stack
+			output += stack.top();	// Set the output to whatever is the top of the stack
+			stack.pop();			// and pop it from the stack
 		}
-		stack.push(input);			// Pushing input onto the stack
+		stack.pop();				// If the top of the stack IS '(' then pop it
 	}
 
-	// While the top isn't a left parentheses
-	while (stack.top() != '(')
+	// Part of the alorithm given on the PDF below
+	else
 	{
-		output += stack.top();	// Add the top of the stack to output
-		stack.pop();			// Pop the stack
+		// If the stack is not empty and while the stack precedence >= input precedence
+		while (!stack.empty() && prec(c) <= prec(stack.top()))	
+		{
+			output += stack.top();	// Add the top of the stack to the output
+			stack.pop();			// Pop the stack
+		}
+		stack.push(c);				// Push input on to stack
 	}
-	cout << output << endl;
-}
+	// While stack is not empty AND the top of the stack is not the left bracket
+	if (!stack.empty()) {
+		while (stack.top() != '(')
+		{
+			output += stack.top();	// Set the output to whatever is the top of the stack
+			stack.pop();			// and pop it from the stack
+		}
+	}
 
+	if (stack.top() == '(')		// If the top of the stack IS '('
+	{
+		stack.pop();			// then pop it
+	}
+
+	// Pop all the remaining elements from the stack and add it to output
+	while (!stack.empty())		// While the stack isn't empty
+	{
+		output += stack.top();		// Add the stack to the output
+		stack.pop();				// Pop remaining elements
+	}
+	cout << output << " ";
+}
+/*
 int postfix(char c)
 {
 	//operatorStack
@@ -106,7 +137,7 @@ int postfix(char c)
 	}
 	return stack.top();
 }
-
+*/
 int prec(char input)
 {
 	// If input is /,*, or %, then return highest precedence
